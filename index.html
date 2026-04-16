@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATE Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #F4F1EC;
+    --surface: #FFFDF9;
+    --ink: #1A1714;
+    --ink-muted: #6B6560;
+    --ink-faint: #B5B0AB;
+    --accent: #C8452A;
+    --accent-light: #F5E8E5;
+    --border: #DDD9D3;
+
+    --phase1: #0891B2; --phase1-bg: #F0FAFF; --phase1-border: #BAE6FD;
+    --phase2: #D97706; --phase2-bg: #FFFBEB; --phase2-border: #FDE68A;
+    --phase3: #059669; --phase3-bg: #ECFDF5; --phase3-border: #A7F3D0;
+    --phase4: #7C3AED; --phase4-bg: #F5F3FF; --phase4-border: #DDD6FE;
+    --phase5: #DC2626; --phase5-bg: #FEF2F2; --phase5-border: #FECACA;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--ink);
+    color: #fff;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--accent);
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+  .header-logo span { color: var(--accent); }
+  .header-badge {
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-ghost {
+    background: transparent;
+    border-color: rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.85);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: #A83420; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-outline {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--ink);
+  }
+  .btn-outline:hover { background: var(--bg); border-color: var(--ink-muted); }
+  .btn-success {
+    background: #059669;
+    color: #fff;
+    border-color: #059669;
+  }
+  .btn-success:hover { background: #047857; }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.1);
+    height: 3px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* LAYOUT */
+  .layout {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    padding: 22px 28px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .card-subtitle { font-size: 13px; color: var(--ink-muted); }
+  .card-body { padding: 24px 28px; }
+
+  /* GENERAL INFO GRID */
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .info-grid .full { grid-column: 1 / -1; }
+
+  /* FORM FIELDS */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+  }
+  .field label .req { color: var(--accent); }
+  input, select, textarea {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 90px; }
+
+  /* PHASE TABS */
+  .phase-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    margin-bottom: 20px;
+  }
+  .phase-tabs::-webkit-scrollbar { display: none; }
+  .phase-tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--ink-muted);
+  }
+  .phase-tab:hover { color: var(--ink); }
+  .phase-tab.active { color: #fff; }
+  .phase-tab.done { background: #ECFDF5; border-color: #6EE7B7; color: #065F46; }
+  .phase-tab.done.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  /* PHASE BLOCK */
+  .phase-block {
+    border-radius: 12px;
+    border: 2px solid;
+    overflow: hidden;
+  }
+  .phase-block-header {
+    padding: 18px 24px;
+  }
+  .phase-block-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .phase-block-desc { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+  .phase-block-body {
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .phase-block-footer {
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1.5px solid rgba(0,0,0,0.07);
+  }
+
+  /* TOAST */
+  #toast-container {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    pointer-events: auto;
+    animation: toastIn 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 320px;
+  }
+  .toast.success { border-left: 4px solid #34D399; }
+  .toast.error { border-left: 4px solid #F87171; }
+  .toast.loading { border-left: 4px solid #60A5FA; }
+  @keyframes toastIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  /* MODAL (preview) */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 720px;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+  }
+  .modal-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h2 { font-family: 'DM Serif Display', serif; font-size: 20px; }
+  .modal-body { overflow-y: auto; padding: 28px; }
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--ink-muted);
+    line-height: 1;
+  }
+  .btn-close:hover { color: var(--ink); }
+
+  /* PREVIEW CONTENT */
+  .preview-doc { font-family: 'DM Sans', sans-serif; }
+  .preview-doc h1 { font-family: 'DM Serif Display', serif; font-size: 26px; margin-bottom: 6px; }
+  .preview-doc .preview-meta { color: var(--ink-muted); font-size: 13px; margin-bottom: 24px; }
+  .preview-phase { margin-bottom: 22px; border-radius: 10px; overflow: hidden; border: 1.5px solid; }
+  .preview-phase-header { padding: 12px 18px; }
+  .preview-phase-header h2 { font-size: 14px; font-weight: 700; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+  .preview-phase-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .preview-field h3 { font-size: 12px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .preview-field p { font-size: 14px; color: var(--ink); white-space: pre-wrap; line-height: 1.6; }
+  .preview-empty { font-size: 13px; color: var(--ink-faint); font-style: italic; padding: 8px 0; }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  /* SAVED BANNER */
+  .saved-banner {
+    background: #ECFDF5;
+    border: 1.5px solid #6EE7B7;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #065F46;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .saved-banner.visible { display: flex; }
+
+  @media (max-width: 600px) {
+    .header { padding: 0 16px; }
+    .layout { padding: 20px 14px 80px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .info-grid .full { grid-column: 1; }
+    .card-body, .card-header { padding: 18px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">ATE<span>Builder</span></div>
+    <div class="header-badge">Beta</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="openPreview()">👁 Vista previa</button>
+    <button class="btn btn-ghost" onclick="handleSave()" id="btn-save">💾 Guardar</button>
+    <button class="btn btn-primary" onclick="handleExportPdf()" id="btn-pdf">↓ PDF</button>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+</header>
+
+<!-- MODAL PREVIEW -->
+<div class="modal-overlay" id="modal-overlay" onclick="closePreviewOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Vista previa del ATE</h2>
+      <button class="btn-close" onclick="closePreview()">✕</button>
+    </div>
+    <div class="modal-body" id="preview-body"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="layout">
+
+  <!-- SAVED BANNER -->
+  <div class="saved-banner" id="saved-banner">
+    ✅ ATE guardada correctamente — ahora puedes descargar el PDF
+  </div>
+
+  <!-- INFO GENERAL -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-header">
+      <div class="card-title">Información general</div>
+      <div class="card-subtitle">Datos básicos de la Actividad de T&E</div>
+    </div>
+    <div class="card-body">
+      <div class="info-grid">
+        <div class="field">
+          <label>Profesor/a <span class="req">*</span></label>
+          <input id="teacherName" type="text" placeholder="Nombre completo">
+        </div>
+        <div class="field">
+          <label>Institución <span class="req">*</span></label>
+          <input id="institution" type="text" placeholder="Nombre de la institución">
+        </div>
+        <div class="field full">
+          <label>Nombre del ATE <span class="req">*</span></label>
+          <input id="ateName" type="text" placeholder="Ej: Construyendo puentes para mi comunidad">
+        </div>
+        <div class="field">
+          <label>Grado</label>
+          <input id="grade" type="text" placeholder="Ej: 9°">
+        </div>
+        <div class="field">
+          <label>Componente <span class="req">*</span></label>
+          <select id="componente">
+            <option value="">Selecciona un componente</option>
+            <option>Naturaleza y Evolución de la T&I</option>
+            <option>Uso y Apropiación de la T&I</option>
+            <option>Solución de Problemas con T&I</option>
+            <option>Tecnología y Sociedad</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo</label>
+          <select id="tipo">
+            <option>Producto</option>
+            <option>Proceso</option>
+            <option>Sistema</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE TABS -->
+  <div class="phase-tabs" id="phase-tabs"></div>
+
+  <!-- PHASE BLOCKS (one rendered at a time) -->
+  <div id="phase-container"></div>
+
+</main>
+
+<script>
+const { jsPDF } = window.jspdf;
+
+// ── DATA ──────────────────────────────────────────────────────────────────
+const PHASES = [
+  {
+    id: 1, name: "CONTEXTUALIZACIÓN", desc: "Identificación del problema o necesidad",
+    color: "#0891B2", bg: "#F0FAFF", border: "#BAE6FD",
+    fields: [
+      { key: "situacionProblema", label: "Situación Problema", type: "textarea", placeholder: "Describe el reto contextualizado y significativo..." },
+      { key: "analisisEntorno", label: "Análisis del Entorno y Recursos", type: "textarea", placeholder: "Describe los recursos disponibles y el contexto local..." },
+      { key: "vinculacionIntereses", label: "Vinculación con Intereses Estudiantiles", type: "textarea", placeholder: "¿Cómo se conecta con los intereses de los estudiantes?" },
+    ]
+  },
+  {
+    id: 2, name: "FUNDAMENTACIÓN", desc: "Definición de objetivos y contenidos",
+    color: "#D97706", bg: "#FFFBEB", border: "#FDE68A",
+    fields: [
+      { key: "objetivosAprendizaje", label: "Objetivos de Aprendizaje", type: "textarea", placeholder: "Define los objetivos que los estudiantes deben lograr..." },
+      { key: "contenidosDisciplinares", label: "Contenidos Disciplinares", type: "textarea", placeholder: "Selecciona los conceptos técnicos y sociales a trabajar..." },
+      { key: "articulacionCurriculo", label: "Articulación con el Currículo MEN", type: "textarea", placeholder: "¿Cómo se articula con los estándares curriculares?" },
+    ]
+  },
+  {
+    id: 3, name: "DISEÑO DIDÁCTICO", desc: "Secuenciación y estrategias",
+    color: "#059669", bg: "#ECFDF5", border: "#A7F3D0",
+    fields: [
+      { key: "secuenciacion", label: "Secuenciación de Actividades", type: "textarea", placeholder: "Describe las actividades en orden secuencial..." },
+      { key: "estrategias", label: "Estrategias Pedagógicas", type: "select", options: ["Aprendizaje Basado en Proyectos (ABP)", "Metodología Maker", "Aprendizaje Colaborativo", "Pensamiento Crítico", "Otro"], placeholder: "Selecciona la estrategia principal" },
+      { key: "rolesYTiempos", label: "Roles y Tiempos", type: "textarea", placeholder: "Define los roles de estudiantes y docente, y tiempos estimados..." },
+    ]
+  },
+  {
+    id: 4, name: "IMPLEMENTACIÓN", desc: "Ejecución y acompañamiento",
+    color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE",
+    fields: [
+      { key: "ejecucion", label: "Ejecución de la Actividad", type: "textarea", placeholder: "Describe cómo se ejecutará la actividad..." },
+      { key: "mediacionDocente", label: "Mediación Docente", type: "textarea", placeholder: "¿Cómo mediará el docente el proceso de aprendizaje?" },
+      { key: "acompanamiento", label: "Acompañamiento a Estudiantes", type: "textarea", placeholder: "¿Cómo se acompañará a los estudiantes durante el proceso?" },
+    ]
+  },
+  {
+    id: 5, name: "EVALUACIÓN", desc: "Evaluación y reflexión",
+    color: "#DC2626", bg: "#FEF2F2", border: "#FECACA",
+    fields: [
+      { key: "tipoEvaluacion", label: "Tipo de Evaluación", type: "select", options: ["Formativa", "Sumativa", "Ambas"], placeholder: "Selecciona el tipo de evaluación" },
+      { key: "criteriosEvaluacion", label: "Criterios de Evaluación", type: "textarea", placeholder: "Define los criterios para evaluar el aprendizaje..." },
+      { key: "instrumentosEvaluacion", label: "Instrumentos de Evaluación", type: "textarea", placeholder: "¿Qué herramientas se usarán? (rúbricas, listas de cotejo, etc.)" },
+      { key: "reflexionRetroalimentacion", label: "Reflexión y Retroalimentación", type: "textarea", placeholder: "¿Cómo se reflexionará sobre el proceso y se dará retroalimentación?" },
+    ]
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let currentPhase = 1;
+let savedPhases = new Set();
+let isSaved = false;
+
+let ateData = {
+  teacherName: "", institution: "", ateName: "", grade: "", componente: "", tipo: "Producto",
+  situacionProblema: "", analisisEntorno: "", vinculacionIntereses: "",
+  objetivosAprendizaje: "", contenidosDisciplinares: "", articulacionCurriculo: "",
+  secuenciacion: "", estrategias: "", rolesYTiempos: "",
+  ejecucion: "", mediacionDocente: "", acompanamiento: "",
+  tipoEvaluacion: "", criteriosEvaluacion: "", instrumentosEvaluacion: "", reflexionRetroalimentacion: ""
+};
+
+// ── STORAGE ───────────────────────────────────────────────────────────────
+function loadFromStorage() {
+  try {
+    const saved = localStorage.getItem('ate_builder_data');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      ateData = { ...ateData, ...parsed.ateData };
+      savedPhases = new Set(parsed.savedPhases || []);
+      isSaved = parsed.isSaved || false;
+    }
+  } catch(e) {}
+}
+
+function saveToStorage() {
+  try {
+    localStorage.setItem('ate_builder_data', JSON.stringify({
+      ateData, savedPhases: Array.from(savedPhases), isSaved
+    }));
+  } catch(e) {}
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+let toastTimeout;
+function showToast(msg, type = 'success', duration = 3000) {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  if (type === 'loading') {
+    el.innerHTML = `<div class="spinner"></div><span>${msg}</span>`;
+  } else {
+    el.textContent = msg;
+  }
+  container.appendChild(el);
+  if (duration > 0) {
+    setTimeout(() => { el.remove(); }, duration);
+  }
+  return el;
+}
+
+// ── RENDER TABS ───────────────────────────────────────────────────────────
+function renderTabs() {
+  const container = document.getElementById('phase-tabs');
+  container.innerHTML = PHASES.map(p => {
+    const isDone = savedPhases.has(p.id);
+    const isActive = currentPhase === p.id;
+    let cls = 'phase-tab';
+    if (isActive) cls += ' active';
+    if (isDone) cls += ' done';
+    const style = isActive ? `style="background:${p.color};border-color:${p.color}"` : '';
+    return `<button class="${cls}" ${style} onclick="switchPhase(${p.id})">
+      ${isDone ? '✓ ' : ''}Fase ${p.id}
+    </button>`;
+  }).join('');
+
+  const progress = (savedPhases.size / 5) * 100;
+  document.getElementById('progress-fill').style.width = progress + '%';
+}
+
+// ── RENDER PHASE CONTENT ──────────────────────────────────────────────────
+function renderPhase() {
+  const phase = PHASES[currentPhase - 1];
+  const container = document.getElementById('phase-container');
+
+  const fieldsHtml = phase.fields.map(f => {
+    if (f.type === 'textarea') {
+      return `<div class="field">
+        <label>${f.label}</label>
+        <textarea id="field_${f.key}" placeholder="${f.placeholder}" oninput="onFieldChange('${f.key}', this.value)">${ateData[f.key] || ''}</textarea>
+      </div>`;
+    } else if (f.type === 'select') {
+      const opts = f.options.map(o =>
+        `<option${ateData[f.key] === o ? ' selected' : ''}>${o}</option>`
+      ).join('');
+      return `<div class="field">
+        <label>${f.label}</label>
+        <select id="field_${f.key}" onchange="onFieldChange('${f.key}', this.value)">
+          <option value="">${f.placeholder}</option>
+          ${opts}
+        </select>
+      </div>`;
+    }
+  }).join('');
+
+  const prevBtn = currentPhase > 1
+    ? `<button class="btn btn-outline" onclick="prevPhase()">← Anterior</button>`
+    : `<div></div>`;
+
+  const nextBtn = currentPhase < 5
+    ? `<button class="btn btn-outline" onclick="nextPhase()">Siguiente →</button>`
+    : `<div class="btn-group" style="display:flex;gap:8px">
+        <button class="btn btn-success" onclick="handleSave()">💾 Guardar ATE</button>
+        <button class="btn btn-primary" onclick="handleExportPdf()">↓ Descargar PDF</button>
+      </div>`;
+
+  container.innerHTML = `
+    <div class="phase-block" style="border-color:${phase.border}">
+      <div class="phase-block-header" style="background:${phase.color}">
+        <div class="phase-block-title">${phase.name}</div>
+        <div class="phase-block-desc">${phase.desc}</div>
+      </div>
+      <div class="phase-block-body" style="background:${phase.bg}">
+        ${fieldsHtml}
+      </div>
+      <div class="phase-block-footer" style="background:${phase.bg}">
+        ${prevBtn}
+        ${nextBtn}
+      </div>
+    </div>`;
+}
+
+// ── SYNC HEADER FIELDS ────────────────────────────────────────────────────
+function syncHeaderFields() {
+  ['teacherName','institution','ateName','grade','componente','tipo'].forEach(key => {
+    const el = document.getElementById(key);
+    if (el) {
+      el.value = ateData[key] || '';
+      el.addEventListener('input', e => onFieldChange(key, e.target.value));
+      el.addEventListener('change', e => onFieldChange(key, e.target.value));
+    }
+  });
+}
+
+function onFieldChange(key, value) {
+  ateData[key] = value;
+  isSaved = false;
+  document.getElementById('saved-banner').classList.remove('visible');
+  saveToStorage();
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function switchPhase(id) {
+  currentPhase = id;
+  renderTabs();
+  renderPhase();
+}
+function nextPhase() {
+  if (currentPhase < 5) { savedPhases.add(currentPhase); currentPhase++; renderTabs(); renderPhase(); }
+}
+function prevPhase() {
+  if (currentPhase > 1) { currentPhase--; renderTabs(); renderPhase(); }
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────────
+function handleSave() {
+  const errors = [];
+  if (!ateData.teacherName.trim()) errors.push('Profesor/a');
+  if (!ateData.institution.trim()) errors.push('Institución');
+  if (!ateData.ateName.trim()) errors.push('Nombre ATE');
+  if (!ateData.componente.trim()) errors.push('Componente');
+  if (errors.length) {
+    showToast('Completa los campos: ' + errors.join(', '), 'error');
+    return;
+  }
+
+  savedPhases = new Set([1,2,3,4,5]);
+  isSaved = true;
+  saveToStorage();
+  renderTabs();
+
+  document.getElementById('saved-banner').classList.add('visible');
+  showToast('✅ ATE guardada correctamente', 'success');
+}
+
+// ── EXPORT PDF ────────────────────────────────────────────────────────────
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return [r,g,b];
+}
+
+function wrapText(doc, text, x, y, maxWidth, lineHeight) {
+  const lines = doc.splitTextToSize(text, maxWidth);
+  lines.forEach(line => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    doc.text(line, x, y);
+    y += lineHeight;
+  });
+  return y;
+}
+
+function handleExportPdf() {
+  if (!isSaved) {
+    showToast('Guarda el ATE primero antes de descargar', 'error');
+    return;
+  }
+
+  const toastEl = showToast('Generando PDF...', 'loading', 0);
+
+  try {
+    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+    const pageW = 210, margin = 18, contentW = pageW - margin * 2;
+    let y = 0;
+
+    // ── Portada / cabecera ──────────────────────────
+    // Fondo oscuro cabecera
+    doc.setFillColor(26, 23, 20);
+    doc.rect(0, 0, pageW, 48, 'F');
+
+    // Título
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(255, 255, 255);
+    const titleLines = doc.splitTextToSize(ateData.ateName || 'Sin nombre', contentW - 10);
+    titleLines.forEach((line, i) => { doc.text(line, margin, 18 + i * 8); });
+
+    // Subtítulo meta
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(180, 170, 160);
+    doc.text(`${ateData.teacherName}  ·  ${ateData.institution}`, margin, 36);
+    doc.text(`Grado: ${ateData.grade || 'N/A'}  ·  Componente: ${ateData.componente || 'N/A'}  ·  Tipo: ${ateData.tipo}`, margin, 42);
+
+    // Acento rojo
+    doc.setFillColor(200, 69, 42);
+    doc.rect(0, 48, pageW, 3, 'F');
+
+    y = 62;
+
+    // ── Fases ──────────────────────────────────────
+    PHASES.forEach(phase => {
+      // Espacio: si queda poco espacio, nueva página
+      if (y > 240) { doc.addPage(); y = 18; }
+
+      // Header de fase
+      const [hr, hg, hb] = hexToRgb(phase.color);
+      doc.setFillColor(hr, hg, hb);
+      doc.roundedRect(margin, y, contentW, 10, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
+      doc.text(phase.name, margin + 4, y + 6.8);
+      y += 14;
+
+      let hasContent = false;
+      phase.fields.forEach(field => {
+        const val = (ateData[field.key] || '').trim();
+        if (!val) return;
+        hasContent = true;
+
+        if (y > 262) { doc.addPage(); y = 18; }
+
+        // Label
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 95, 90);
+        doc.text(field.label.toUpperCase(), margin, y);
+        y += 4.5;
+
+        // Value
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(30, 25, 20);
+        const lines = doc.splitTextToSize(val, contentW);
+        lines.forEach(line => {
+          if (y > 272) { doc.addPage(); y = 18; }
+          doc.text(line, margin, y);
+          y += 5;
+        });
+        y += 4;
+      });
+
+      if (!hasContent) {
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(9);
+        doc.setTextColor(160, 155, 150);
+        doc.text('(Fase no completada)', margin, y);
+        y += 6;
+      }
+
+      // Línea separadora
+      doc.setDrawColor(220, 215, 210);
+      doc.setLineWidth(0.3);
+      doc.line(margin, y, pageW - margin, y);
+      y += 8;
+    });
+
+    // ── Pie de página ──────────────────────────────
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(160, 155, 150);
+      doc.text(`ATE Builder · ${new Date().toLocaleDateString('es-CO')}`, margin, 290);
+      doc.text(`Página ${i} de ${totalPages}`, pageW - margin, 290, { align: 'right' });
+    }
+
+    const filename = `ATE_${(ateData.ateName || 'documento').replace(/[^a-z0-9áéíóúñ ]/gi,'_')}.pdf`;
+    doc.save(filename);
+
+    toastEl.remove();
+    showToast('✅ PDF descargado correctamente', 'success');
+  } catch(err) {
+    toastEl.remove();
+    showToast('Error al generar el PDF: ' + err.message, 'error');
+    console.error(err);
+  }
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────────────────
+function openPreview() {
+  const body = document.getElementById('preview-body');
+
+  const meta = [
+    ateData.institution, ateData.grade, ateData.componente, ateData.tipo
+  ].filter(Boolean).join(' · ');
+
+  let html = `<div class="preview-doc">
+    <h1>${ateData.ateName || 'Sin nombre'}</h1>
+    <p class="preview-meta">${ateData.teacherName || '—'}${meta ? ' · ' + meta : ''}</p>`;
+
+  PHASES.forEach(phase => {
+    html += `<div class="preview-phase" style="border-color:${phase.border}">
+      <div class="preview-phase-header" style="background:${phase.color}">
+        <h2>${phase.name}</h2>
+      </div>
+      <div class="preview-phase-body" style="background:${phase.bg}">`;
+
+    let hasContent = false;
+    phase.fields.forEach(f => {
+      const val = (ateData[f.key] || '').trim();
+      if (!val) return;
+      hasContent = true;
+      html += `<div class="preview-field">
+        <h3>${f.label}</h3>
+        <p>${val.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+      </div>`;
+    });
+
+    if (!hasContent) html += `<p class="preview-empty">Fase no completada</p>`;
+    html += `</div></div>`;
+  });
+
+  html += `<p style="text-align:center;font-size:11px;color:#B5B0AB;margin-top:24px">
+    ATE Builder · ${new Date().toLocaleDateString('es-CO')}
+  </p></div>`;
+
+  body.innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closePreview() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function closePreviewOutside(e) {
+  if (e.target === document.getElementById('modal-overlay')) closePreview();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+loadFromStorage();
+syncHeaderFields();
+renderTabs();
+renderPhase();
+
+if (isSaved) {
+  document.getElementById('saved-banner').classList.add('visible');
+}
+</script>
+</body>
+</html>
