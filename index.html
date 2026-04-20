@@ -362,11 +362,485 @@
     .info-grid .full { grid-column: 1; }
     .card-body, .card-header { padding: 18px 16px; }
   }
+
+  /* ═══════════════════════════════════════
+     WELCOME SCREEN
+  ═══════════════════════════════════════ */
+  #welcome-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #0F1117;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #welcome-screen.hidden { display: none; }
+
+  .welcome-hero {
+    width: 100%;
+    max-width: 780px;
+    padding: 60px 32px 0;
+    text-align: center;
+  }
+
+  .welcome-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #C8452A;
+    margin-bottom: 18px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.1s forwards;
+  }
+
+  .welcome-greeting {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(38px, 6vw, 60px);
+    color: #fff;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+  .welcome-greeting .accent { color: #C8452A; }
+
+  .welcome-subtitle {
+    font-size: 16px;
+    color: #9B9590;
+    max-width: 520px;
+    margin: 0 auto 48px;
+    line-height: 1.65;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.3s forwards;
+  }
+
+  /* Divider */
+  .welcome-divider {
+    width: 100%;
+    max-width: 780px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #2E2B27, transparent);
+    margin: 8px 0 40px;
+    opacity: 0;
+    animation: fadeIn 0.6s 0.4s forwards;
+  }
+
+  /* What is ATE section */
+  .welcome-section {
+    width: 100%;
+    max-width: 780px;
+    padding: 0 32px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.45s forwards;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #C8452A;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #2E2B27;
+  }
+
+  .ate-definition {
+    background: #181B22;
+    border: 1px solid #2A2724;
+    border-left: 3px solid #C8452A;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 18px;
+  }
+  .ate-definition p {
+    color: #D4CFC9;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  .ate-definition strong { color: #fff; font-weight: 600; }
+
+  /* ATE pillars grid */
+  .ate-pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 600px) {
+    .ate-pillars { grid-template-columns: 1fr; }
+    .welcome-hero, .welcome-section { padding-left: 20px; padding-right: 20px; }
+  }
+
+  .pillar {
+    background: #181B22;
+    border: 1px solid #2A2724;
+    border-radius: 10px;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pillar-icon {
+    font-size: 22px;
+    line-height: 1;
+  }
+  .pillar-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 0.2px;
+  }
+  .pillar-desc {
+    font-size: 12.5px;
+    color: #7A7570;
+    line-height: 1.55;
+  }
+
+  /* ATE anatomy mini diagram */
+  .ate-anatomy {
+    background: #181B22;
+    border: 1px solid #2A2724;
+    border-radius: 10px;
+    padding: 22px 28px;
+    margin-bottom: 18px;
+  }
+  .anatomy-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media (max-width: 600px) { .anatomy-grid { grid-template-columns: 1fr; } }
+  .anatomy-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .anatomy-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .anatomy-text { font-size: 13px; color: #9B9590; line-height: 1.5; }
+  .anatomy-text strong { color: #D4CFC9; font-weight: 600; }
+
+  /* Tips section */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) { .tips-grid { grid-template-columns: 1fr; } }
+
+  .tip-card {
+    background: #181B22;
+    border: 1px solid #2A2724;
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .tip-num {
+    width: 26px;
+    height: 26px;
+    background: #C8452A;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .tip-content { flex: 1; }
+  .tip-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .tip-desc { font-size: 12.5px; color: #7A7570; line-height: 1.55; }
+
+  /* Phases mini strip */
+  .phases-strip {
+    background: #181B22;
+    border: 1px solid #2A2724;
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+  }
+  .phase-mini {
+    flex: 1;
+    text-align: center;
+    padding: 10px 6px;
+    border-right: 1px solid #2A2724;
+    position: relative;
+  }
+  .phase-mini:last-child { border-right: none; }
+  .phase-mini-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: #5A5550;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .phase-mini-name {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+  .phase-mini-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin: 8px auto 0;
+  }
+
+  /* CTA */
+  .welcome-cta-wrap {
+    width: 100%;
+    max-width: 780px;
+    padding: 0 32px 60px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.65s forwards;
+  }
+  .welcome-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn-welcome {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    background: #C8452A;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+  .btn-welcome:hover {
+    background: #A83420;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(200, 69, 42, 0.35);
+  }
+  .welcome-cta-note {
+    font-size: 12px;
+    color: #5A5550;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
 </style>
 </head>
 <body>
 
-<div id="toast-container"></div>
+<!-- ═══════════════════════════════════════════
+     WELCOME SCREEN
+═══════════════════════════════════════════ -->
+<div id="welcome-screen">
+
+  <!-- HERO -->
+  <div class="welcome-hero">
+    <div class="welcome-eyebrow">Herramienta para docentes · Tecnología e Informática</div>
+    <h1 class="welcome-greeting">
+      Bienvenido/a,<br><span class="accent">Docente</span>
+    </h1>
+    <p class="welcome-subtitle">
+      Esta herramienta te guía paso a paso para diseñar una
+      <strong style="color:#D4CFC9">Actividad Tecnológica Escolar (ATE)</strong>
+      sólida, pertinente y lista para el aula.
+    </p>
+  </div>
+
+  <div class="welcome-divider"></div>
+
+  <!-- ¿QUÉ ES UNA ATE? -->
+  <div class="welcome-section">
+    <div class="section-label">¿Qué es una ATE?</div>
+
+    <div class="ate-definition">
+      <p>
+        Una <strong>Actividad Tecnológica Escolar (ATE)</strong> es una propuesta didáctica estructurada
+        para enseñar la tecnología en sus tres dimensiones: <strong>Diseño, Construcción y Reflexión</strong>.
+        Está fundamentada en el <strong>construccionismo de Papert</strong> y articula el
+        <em>"aprender haciendo"</em> con pensamiento crítico.
+      </p>
+      <p style="margin-top:12px">
+        Su propósito es <strong>desarrollar competencias tecnológicas</strong> mediante la solución de
+        problemas reales del entorno de los estudiantes, conectando el currículo con la vida cotidiana.
+      </p>
+    </div>
+
+    <div class="ate-pillars">
+      <div class="pillar">
+        <div class="pillar-icon">🎨</div>
+        <div class="pillar-title">Diseño</div>
+        <div class="pillar-desc">Planificación creativa de soluciones a un problema o necesidad real del contexto.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🔨</div>
+        <div class="pillar-title">Construcción</div>
+        <div class="pillar-desc">Materialización de la solución con herramientas y materiales disponibles en el entorno.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🔍</div>
+        <div class="pillar-title">Reflexión</div>
+        <div class="pillar-desc">Análisis crítico del proceso, los resultados y el impacto de la solución creada.</div>
+      </div>
+    </div>
+
+    <!-- Anatomía -->
+    <div class="ate-anatomy">
+      <div class="section-label" style="margin-bottom:0">Componentes esenciales de una ATE</div>
+      <div class="anatomy-grid">
+        <div class="anatomy-item">
+          <div class="anatomy-dot" style="background:#0891B2"></div>
+          <div class="anatomy-text"><strong>Situación problema</strong> — Reto contextualizado y significativo para los estudiantes.</div>
+        </div>
+        <div class="anatomy-item">
+          <div class="anatomy-dot" style="background:#D97706"></div>
+          <div class="anatomy-text"><strong>Objetivos</strong> — Competencias tecnológicas y sociales a desarrollar.</div>
+        </div>
+        <div class="anatomy-item">
+          <div class="anatomy-dot" style="background:#059669"></div>
+          <div class="anatomy-text"><strong>Contenidos</strong> — Conceptos técnicos y sociales articulados al MEN.</div>
+        </div>
+        <div class="anatomy-item">
+          <div class="anatomy-dot" style="background:#7C3AED"></div>
+          <div class="anatomy-text"><strong>Recursos</strong> — Herramientas, materiales y espacios disponibles.</div>
+        </div>
+        <div class="anatomy-item">
+          <div class="anatomy-dot" style="background:#DC2626"></div>
+          <div class="anatomy-text"><strong>Evaluación</strong> — Criterios e instrumentos de valoración del proceso.</div>
+        </div>
+        <div class="anatomy-item">
+          <div class="anatomy-dot" style="background:#C8452A"></div>
+          <div class="anatomy-text"><strong>Secuencia didáctica</strong> — Momentos de diseño, construcción y reflexión.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Las 5 fases -->
+    <div class="section-label">Las 5 fases del diseño ATE</div>
+    <div class="phases-strip">
+      <div class="phase-mini">
+        <div class="phase-mini-num">01</div>
+        <div class="phase-mini-name">Contextu-alización</div>
+        <div class="phase-mini-dot" style="background:#0891B2"></div>
+      </div>
+      <div class="phase-mini">
+        <div class="phase-mini-num">02</div>
+        <div class="phase-mini-name">Funda-mentación</div>
+        <div class="phase-mini-dot" style="background:#D97706"></div>
+      </div>
+      <div class="phase-mini">
+        <div class="phase-mini-num">03</div>
+        <div class="phase-mini-name">Diseño Didáctico</div>
+        <div class="phase-mini-dot" style="background:#059669"></div>
+      </div>
+      <div class="phase-mini">
+        <div class="phase-mini-num">04</div>
+        <div class="phase-mini-name">Imple-mentación</div>
+        <div class="phase-mini-dot" style="background:#7C3AED"></div>
+      </div>
+      <div class="phase-mini">
+        <div class="phase-mini-num">05</div>
+        <div class="phase-mini-name">Evaluación</div>
+        <div class="phase-mini-dot" style="background:#DC2626"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSEJOS -->
+  <div class="welcome-section" style="animation-delay:0.55s">
+    <div class="section-label">Consejos antes de comenzar</div>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-num">1</div>
+        <div class="tip-content">
+          <div class="tip-title">Elige un problema real y cercano</div>
+          <div class="tip-desc">El mejor ATE nace de una necesidad auténtica del entorno de tus estudiantes. No inventes problemas; obsérvelos en su comunidad.</div>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">2</div>
+        <div class="tip-content">
+          <div class="tip-title">Verifica la viabilidad antes de diseñar</div>
+          <div class="tip-desc">Considera materiales disponibles, tiempo de clase, infraestructura y nivel de complejidad adecuado para tus estudiantes.</div>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">3</div>
+        <div class="tip-content">
+          <div class="tip-title">Articula con el currículo del MEN</div>
+          <div class="tip-desc">Asegúrate de que la ATE esté alineada con los estándares y competencias del área de Tecnología e Informática.</div>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">4</div>
+        <div class="tip-content">
+          <div class="tip-title">Planifica los tres momentos</div>
+          <div class="tip-desc">Toda ATE debe tener espacio explícito para Diseño, Construcción y Reflexión. No omitas la reflexión: es donde ocurre el aprendizaje profundo.</div>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">5</div>
+        <div class="tip-content">
+          <div class="tip-title">Involucra a los estudiantes desde el inicio</div>
+          <div class="tip-desc">Cuando los estudiantes participan en identificar el problema, su motivación y compromiso aumentan significativamente.</div>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">6</div>
+        <div class="tip-content">
+          <div class="tip-title">Define criterios de evaluación claros</div>
+          <div class="tip-desc">Comparte la rúbrica con tus estudiantes desde el inicio. Evalúa el proceso, no solo el producto final.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="welcome-cta-wrap">
+    <div class="welcome-cta">
+      <button class="btn-welcome" onclick="enterBuilder()">
+        ✏️ &nbsp; Comenzar a diseñar mi ATE
+      </button>
+      <div class="welcome-cta-note">Completa las 5 fases y descarga tu ATE en PDF</div>
+    </div>
+  </div>
+
+</div>
+<!-- END WELCOME SCREEN -->
 
 <!-- HEADER -->
 <header class="header">
@@ -375,6 +849,7 @@
     <div class="header-badge">Beta</div>
   </div>
   <div class="header-actions">
+    <button class="btn btn-ghost" onclick="goToWelcome()" title="Volver al inicio">← Inicio</button>
     <button class="btn btn-ghost" onclick="openPreview()">👁 Vista previa</button>
     <button class="btn btn-ghost" onclick="handleSave()" id="btn-save">💾 Guardar</button>
     <button class="btn btn-primary" onclick="handleExportPdf()" id="btn-pdf">↓ PDF</button>
@@ -874,11 +1349,29 @@ function closePreviewOutside(e) {
   if (e.target === document.getElementById('modal-overlay')) closePreview();
 }
 
+// ── WELCOME SCREEN ────────────────────────────────────────────────────────
+function enterBuilder() {
+  document.getElementById('welcome-screen').classList.add('hidden');
+  try { localStorage.setItem('ate_builder_welcomed', '1'); } catch(e) {}
+}
+
+function goToWelcome() {
+  document.getElementById('welcome-screen').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────
 loadFromStorage();
 syncHeaderFields();
 renderTabs();
 renderPhase();
+
+// Skip welcome screen for returning users
+try {
+  if (localStorage.getItem('ate_builder_welcomed')) {
+    document.getElementById('welcome-screen').classList.add('hidden');
+  }
+} catch(e) {}
 
 if (isSaved) {
   document.getElementById('saved-banner').classList.add('visible');
